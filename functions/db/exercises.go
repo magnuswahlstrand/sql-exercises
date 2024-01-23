@@ -15,20 +15,21 @@ var exercises = []Exercise{
 	{
 		ID: "select_all",
 		Correct: [][]any{
-			{1, "Larsson", 48000, "Accounting"},
-			{2, "Bergstrom", 52000, "Sales"},
-			{3, "Hakansson", 46000, "Marketing"},
-			{4, "Svensson", 39000, "Accounting"},
-			{5, "Lindberg", 56000, "Sales"},
-			{6, "Nyström", 58000, "Sales"},
-			{7, "Holm", 43000, "IT"},
-			{8, "Engström", 50000, "Marketing"},
+			{"Larsson", int64(48000), "Accounting"},
+			{"Bergstrom", int64(52000), "Sales"},
+			{"Hakansson", int64(46000), "Marketing"},
+			{"Svensson", int64(39000), "Accounting"},
+			{"Lindberg", int64(56000), "Sales"},
+			{"Nyström", int64(58000), "Sales"},
+			{"Holm", int64(43000), "IT"},
+			{"Engström", int64(50000), "Marketing"},
 		},
 		Test: Test{
 			Name:  "Exercise 1",
 			Query: "SELECT * FROM employees",
 		},
 	},
+
 	//{
 	//	ID: "select all",
 	//	Correct: [][]any{

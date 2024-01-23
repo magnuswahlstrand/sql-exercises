@@ -1,20 +1,45 @@
-# Config file for [Air](https://github.com/cosmtrek/air) in TOML format
-
-# Working directory
-# . or absolute path, please note that the directories following must be under root.
-root = "./"
+root = "."
+testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-# Just plain old shell command. You could use `make` as well.
-# Binary file yields from `cmd`.
-cmd = "go test -v ./functions/... || true"
-#cmd = "go test -v ./functions/app || true"
+args_bin = []
+#post_cmd = ["npx browser-sync reload"]
+bin = "./tmp/main"
+cmd = "go build -o ./tmp/main ./cli"
+delay = 1
+exclude_dir = ["assets", "tmp", "node_modules"]
+exclude_file = []
+exclude_regex = ["_test.go"]
+exclude_unchanged = false
+follow_symlink = false
+full_bin = ""
+include_dir = []
+include_ext = ["go", "tpl", "tmpl", "html", "gohtml"]
+#include_file = ["index.go"]
+kill_delay = 500
+log = "build-errors.log"
+poll = false
+poll_interval = 0
+rerun = false
+rerun_delay = 500
+send_interrupt = false
+stop_on_error = true
 
-# Watch these filename extensions.
-include_ext = ["go", "tpl", "tmpl", "html"]
+[color]
+app = ""
+build = "yellow"
+main = "magenta"
+runner = "green"
+watcher = "cyan"
 
-# Ignore these filename extensions or directories.
-exclude_dir = ["assets", "tmp", "vendor", "node_modules"]
+[log]
+main_only = false
+time = false
 
-stop_on_error = false
+[misc]
+clean_on_exit = false
+
+[screen]
+clear_on_rebuild = false
+keep_scroll = true

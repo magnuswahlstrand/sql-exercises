@@ -9,6 +9,7 @@ require (
 	github.com/aws/jsii-runtime-go v1.94.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.0
 	github.com/gofiber/fiber/v2 v2.52.0
+	github.com/gofiber/template/html/v2 v2.1.0
 	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/stretchr/testify v1.8.4
 )
@@ -21,6 +22,8 @@ require (
 	github.com/cdklabs/awscdk-asset-node-proxy-agent-go/nodeproxyagentv6/v2 v2.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
+	github.com/gofiber/template v1.8.2 // indirect
+	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

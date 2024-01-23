@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>HTMX</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"
+            integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script>
+        // htmx.logAll();
+
+        htmx.on("htmx:sseOpen", function(evt) {
+            console.log("sseOpen", evt);
+        });
+        htmx.on("htmx:sseMessage", function(evt) {
+            // console.log("sseMessage", evt.detail.type == "trigger_reload");
+
+            if (evt.detail.type == "trigger_reload") {
+                console.log("RELOAD")
+                window.location.reload();
+            }
+        });
+        //
+        // htmx.on("sse:message", function(evt) {
+        //     console.log("s1", evt);
+        // });
+        //
+        //
+        // htmx.on("htmx:sse:message", function(evt) {
+        //     console.log("s2", evt);
+        // });
+        //
+        //
+        // htmx.on("sse:trigger_reload", function(evt) {
+        //     console.log("s3", evt);
+        // });
+        //
+        //
+        // htmx.on("htmx:sse:trigger_reload", function(evt) {
+        //     console.log("s4", evt);
+        // });
+        //
+        // document.body.addEventListener('htmx:sseMessage', function (evt) {
+        //     console.log("got an update event", evt.detail.type);
+        //     if (evt.detail.type.indexOf("update-") == -1) {
+        //         return;
+        //     }
+        //     return;
+        // })
+    </script>
+</head>
+<style>
+    * {
+        outline: 1px solid red;
+    }
+</style>
+<body>
+<div hx-ext="sse" sse-connect="/sse?version={{.ServerVersion}}" sse-swap="trigger_reload" hx-vals="{'version': {{.ServerVersion}} }">
+{{/*    empty*/}}
+</div>
+foo5
+<div class="container mx-auto">
+    <div class="flex flex-row flex-wrap py-4">
+        <aside class="w-full sm:w-1/3 md:w-1/4 px-2">
+            <div class="sticky top-0 p-4 w-full">
+                <h2>Exercises</h2>
+                <ul class="flex flex-col overflow-hidden">
+                    ...
+                </ul>
+            </div>
+        </aside>
+        <main role="main" class="w-full sm:w-2/3 md:w-3/4 pt-1 px-2">
+            <div class="flex justify-center ">Answer</div>
+            <textarea class="w-full"
+                      name="query"
+                      hx-get="http://localhost:3000/check/select_all"
+                      hx-trigger="load, input changed delay:500ms, search"
+                      hx-target="#results"
+                      hx-indicator=".htmx-indicator">
+select * from employees            </textarea>
+
+            <div class="flex justify-center ">Results</div>
+            <div id="results" class="justify-center">
+                aa
+            </div>
+        </main>
+    </div>
+</div>
+fooxs me11
+
+</body>
+</html>

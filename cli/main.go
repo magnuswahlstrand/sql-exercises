@@ -1,7 +1,14 @@
 package main
 
-import "github.com/magnuswahlstrand/sql-exercises/functions/app"
+import (
+	"fmt"
+	"github.com/magnuswahlstrand/sql-exercises/functions/app"
+	"time"
+)
 
 func main() {
-	app.SetupApp().Listen(":3000")
+	before := time.Now()
+	a := app.SetupApp()
+	fmt.Println("Setup took", time.Since(before))
+	a.Listen(":3000")
 }

@@ -20,7 +20,6 @@ func requireBody(t *testing.T, expectedBody string, resp *http.Response) {
 
 func CheckQuery(t *testing.T, exerciseId string, query string, app *fiber.App) error {
 	url := fmt.Sprintf("/check/%s?query=%s", exerciseId, url2.QueryEscape(query))
-	fmt.Println(url)
 	req := httptest.NewRequest("GET", url, nil)
 
 	// Act
