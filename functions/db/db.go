@@ -1,6 +1,12 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+	"fmt"
+
+	_ "github.com/mattn/go-sqlite3"
+)
 
 var createEmployeesTableQuery = `
 CREATE TABLE employees (
@@ -27,14 +33,44 @@ func prepareDB() *sql.DB {
 		panic(err)
 	}
 
-	_, err = db.Exec(createEmployeesTableQuery)
+	fmt.Println("YEAH")
+	res, err := db.Exec(createEmployeesTableQuery)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(res.RowsAffected())
+
+	res2, err := db.Query("SELECT * FROM employees")
+	if err != nil {
+		panic(err)
+	}
+	res2.Close()
+	fmt.Println(res2.Columns())
+
+	res3, err := db.Query("SELECT * FROM employees")
+	if err != nil {
+		panic(err)
+	}
+	res3.Close()
+	fmt.Println(res3.Columns())
+
+	res4, err := db.Query("SELECT * FROM employees")
+	if err != nil {
+		panic(err)
+	}
+	res4.Close()
+	fmt.Println(res4.Columns())
+
 	return db
 }
 
 func Query(db *sql.DB, query string) ([][]any, error) {
+	//res2, err := db.Query("SELECT * FROM employees")
+	//if err == nil {
+	//	fmt.Println(res2.Columns())
+	//}
+	//res2.Close()
+
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -48,6 +84,7 @@ func Query(db *sql.DB, query string) ([][]any, error) {
 	numCols := len(cols)
 
 	var records [][]any
+
 	for rows.Next() {
 		// Create a slice of interfaces to hold the column values
 		columnValues := make([]interface{}, numCols)
@@ -60,9 +97,52 @@ func Query(db *sql.DB, query string) ([][]any, error) {
 		if err := rows.Scan(columnPointers...); err != nil {
 			return nil, err
 		}
-
 		records = append(records, columnValues)
 	}
 
 	return records, nil
+}
+
+type Checker struct {
+	DB *sql.DB
+}
+
+func (c *Checker) Check(exerciseId string, query string) (bool, error) {
+	exercise, found := exercisesMap[exerciseId]
+	if !found {
+		return false, errors.New("exercise not found")
+	}
+
+	//res2, err := c.DB.Query("SELECT * FROM employees")
+	//if err != nil {
+	//	return false, err
+	//}
+	//defer res2.Close()
+
+	records, err := Query(c.DB, query)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println("YEAH4")
+
+	fmt.Println(exercise.Correct)
+	fmt.Println(records)
+	//for i := range exercise.Correct {
+	//	if !equal(exercise.Correct[i], records[i]) {
+	//		return false, nil
+	//	}
+	//}
+
+	return true, nil
+}
+
+func NewChecker() *Checker {
+	db := prepareDB()
+	res4, err := db.Query("SELECT * FROM employees")
+	if err != nil {
+		panic(err)
+	}
+	res4.Close()
+
+	return &Checker{DB: db}
 }

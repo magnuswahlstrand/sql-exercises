@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -18,6 +17,7 @@ func TestExercises(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			assert.Equal(t, len(tc.Correct), len(records))
 			for i := range tc.Correct {
 				assert.EqualValues(t, fmt.Sprint(tc.Correct[i]), fmt.Sprint(records[i]))
 			}

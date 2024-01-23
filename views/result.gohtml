@@ -1,0 +1,16 @@
+<table>
+    <tr>
+        {{range .Headers}}
+        {{range .Cols}}
+            <td>{{.}}</td>
+        {{end}}
+    <tr>
+        {{end}}
+        {{range .Rows}}
+    <tr>
+        {{range .Cols}}
+            <td>{{.}}</td>
+        {{end}}
+    </tr>
+    {{end}}
+</table>
