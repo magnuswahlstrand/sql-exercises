@@ -1,9 +1,10 @@
-package db
+package exercises
 
 type Exercise struct {
-	ID      string
-	Correct [][]any
-	Test    Test
+	ID             string
+	CorrectHeaders []string
+	Correct        [][]any
+	Test           Test
 }
 
 type Test struct {
@@ -11,9 +12,14 @@ type Test struct {
 	Query string
 }
 
-var exercises = []Exercise{
+var Exercises = []Exercise{
 	{
 		ID: "select_all",
+		CorrectHeaders: []string{
+			"last_name",
+			"salary",
+			"department",
+		},
 		Correct: [][]any{
 			{"Larsson", int64(48000), "Accounting"},
 			{"Bergstrom", int64(52000), "Sales"},
@@ -66,6 +72,6 @@ var exercises = []Exercise{
 	//},
 }
 
-var exercisesMap = map[string]Exercise{
-	exercises[0].ID: exercises[0],
+var ExercisesMap = map[string]Exercise{
+	Exercises[0].ID: Exercises[0],
 }

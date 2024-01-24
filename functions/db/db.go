@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/magnuswahlstrand/sql-exercises/functions/exercises"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -89,7 +90,7 @@ type Response struct {
 }
 
 func (c *Checker) Check(exerciseId string, query string) (*Response, error) {
-	exercise, found := exercisesMap[exerciseId]
+	exercise, found := exercises.ExercisesMap[exerciseId]
 	if !found {
 		return nil, errors.New("exercise not found")
 	}
@@ -108,7 +109,7 @@ func (c *Checker) Check(exerciseId string, query string) (*Response, error) {
 	return response, nil
 }
 
-func isCorrect(exercise Exercise, records [][]any) bool {
+func isCorrect(exercise exercises.Exercise, records [][]any) bool {
 	if len(exercise.Correct) != len(records) {
 		return false
 	}

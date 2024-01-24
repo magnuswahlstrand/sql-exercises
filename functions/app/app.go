@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 	"github.com/magnuswahlstrand/sql-exercises/functions/db"
-	"github.com/valyala/fasthttp"
+	"github.com/magnuswahlstrand/sql-exercises/functions/exercises"
 	"net/http"
 	"strconv"
 	"time"
@@ -51,6 +51,10 @@ func SetupApp() *fiber.App {
 	// TODO: Close DB
 	app.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.Render("views/index", fiber.Map{
+			"Expected": fiber.Map{
+				"Headers": exercises.Exercises[0].CorrectHeaders,
+				"Rows":    exercises.Exercises[0].Correct,
+			},
 			"ServerVersion": serverVersion,
 		})
 	})
@@ -64,7 +68,7 @@ func SetupApp() *fiber.App {
 
 		result, err := checker.Check(exerciseId, query)
 		if err != nil {
-			return ctx.Status(500).SendString(err.Error())
+			return ctx.Status(200).SendString(err.Error())
 		}
 
 		statusCode := 200
@@ -73,24 +77,24 @@ func SetupApp() *fiber.App {
 			statusCode = 200
 		}
 
-		return ctx.Status(statusCode).Render("views/result", result)
+		return ctx.Status(statusCode).Render("views/output_table", fiber.Map{
+			"Headers": result.Headers,
+			"Rows":    result.Rows,
+		})
 	})
 
 	sseHandler := func(c *fiber.Ctx) error {
 		version := c.Query("version")
-		fmt.Println("YEAH1", version)
 		c.Set("Content-Type", "text/event-stream")
 		c.Set("Cache-Control", "no-cache")
 		c.Set("Connection", "keep-alive")
 		c.Set("Transfer-Encoding", "chunked")
 
-		c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-
+		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
 			if version != serverVersion {
 				fmt.Fprintf(w, "event: trigger_reload\n")
-				fmt.Fprintf(w, "data: <div>Content to swap into your HTML page.</div>\n\n")
-				err := w.Flush()
-				if err != nil {
+				fmt.Fprintf(w, "data: \"\"\n\n")
+				if err := w.Flush(); err != nil {
 					fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
 				}
 			} else {
@@ -99,22 +103,10 @@ func SetupApp() *fiber.App {
 			//msg := fmt.Sprintf("%d - the 2time is %v", i, time.Now())
 
 			for {
-
-				//i++
-				//if err != nil {
-				//	fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
-				//	break
-				//}
-				//
-				//fmt.Fprintf(w, "event: trigger_reload\n")
-				//fmt.Fprintf(w, "data: <div>Content to swap into your HTML page.</div>\n\n")
-				//err = w.Flush()
-				fmt.Println("YEAH3")
-
 				// TODO: lock here forever, instead?
 				time.Sleep(1 * time.Second)
 			}
-		}))
+		})
 
 		return nil
 	}
