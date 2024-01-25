@@ -1,0 +1,13 @@
+{{ if eq .Url "" }}
+<a class="bg-orange-200 text-white font-bold py-2 px-4 rounded"
+   disabled
+>
+{{ else }}
+<a class="bg-orange-500 hover:bg-orange-600 active:bg-orange-700
+text-white font-medium py-2 px-4 rounded focus:ring-4 focus:ring-orange-900"
+   href="{{.Url}}"
+   hx-ext="preload"
+>
+{{ end}}
+    {{.Text}}
+</a>

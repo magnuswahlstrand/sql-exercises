@@ -4,17 +4,22 @@ type Exercise struct {
 	ID             string
 	CorrectHeaders []string
 	Correct        [][]any
-	Test           Test
+	Description    string
+	AnswerQuery    string
+	Title          string
 }
 
-type Test struct {
-	Name  string
-	Query string
+type ExtenderExercise struct {
+	Exercise
+	Previous string
+	Next     string
 }
 
 var Exercises = []Exercise{
 	{
-		ID: "select_all",
+		Title:       "Select everything!",
+		ID:          "select_all",
+		Description: "Select all columns from the employees table.",
 		CorrectHeaders: []string{
 			"last_name",
 			"salary",
@@ -30,48 +35,67 @@ var Exercises = []Exercise{
 			{"Holm", int64(43000), "IT"},
 			{"Engström", int64(50000), "Marketing"},
 		},
-		Test: Test{
-			Name:  "Exercise 1",
-			Query: "SELECT * FROM employees",
-		},
+		AnswerQuery: "SELECT * FROM employees",
 	},
 
-	//{
-	//	ID: "select all",
-	//	Correct: [][]any{
-	//		{"Larsson", "Accounting"},
-	//		{"Bergstrom", "Sales"},
-	//		{"Hakansson", "Marketing"},
-	//		{"Svensson", "Accounting"},
-	//		{"Lindberg", "Sales"},
-	//		{"Nyström", "Sales"},
-	//		{"Holm", "IT"},
-	//		{"Engström", "Marketing"},
-	//	},
-	//	Test: Test{
-	//		Name:  "Exercise 2",
-	//		Query: "SELECT last_name, department FROM employees",
-	//	},
-	//},
-	//{
-	//	ID: "select all",
-	//	Correct: [][]any{
-	//		{6, "Nyström", 58000, "Sales"},
-	//		{5, "Lindberg", 56000, "Sales"},
-	//		{2, "Bergstrom", 52000, "Sales"},
-	//		{8, "Engström", 50000, "Marketing"},
-	//		{1, "Larsson", 48000, "Accounting"},
-	//		{3, "Hakansson", 46000, "Marketing"},
-	//		{7, "Holm", 43000, "IT"},
-	//		{4, "Svensson", 39000, "Accounting"},
-	//	},
-	//	Test: Test{
-	//		Name:  "Exercise 3",
-	//		Query: "SELECT * FROM employees ORDER BY salary DESC",
-	//	},
-	//},
+	{
+		ID:          "select_columns",
+		Description: "Select last_name and department from the employees table.",
+		CorrectHeaders: []string{
+			"last_name",
+			"department",
+		},
+		Correct: [][]any{
+			{"Larsson", "Accounting"},
+			{"Bergstrom", "Sales"},
+			{"Hakansson", "Marketing"},
+			{"Svensson", "Accounting"},
+			{"Lindberg", "Sales"},
+			{"Nyström", "Sales"},
+			{"Holm", "IT"},
+			{"Engström", "Marketing"},
+		},
+		AnswerQuery: "SELECT last_name, department FROM employees",
+	},
+	{
+		ID:          "select_order_by",
+		Description: "Select all columns from the employees table, ordered by salary in descending order.",
+		CorrectHeaders: []string{
+			"last_name",
+			"salary",
+			"department",
+		},
+		Correct: [][]any{
+			{"Nyström", 58000, "Sales"},
+			{"Lindberg", 56000, "Sales"},
+			{"Bergstrom", 52000, "Sales"},
+			{"Engström", 50000, "Marketing"},
+			{"Larsson", 48000, "Accounting"},
+			{"Hakansson", 46000, "Marketing"},
+			{"Holm", 43000, "IT"},
+			{"Svensson", 39000, "Accounting"},
+		},
+		AnswerQuery: "SELECT * FROM employees ORDER BY salary DESC",
+	},
 }
 
-var ExercisesMap = map[string]Exercise{
-	Exercises[0].ID: Exercises[0],
+var ExercisesMap map[string]ExtenderExercise
+
+func init() {
+	ExercisesMap = make(map[string]ExtenderExercise)
+	for i, e := range Exercises {
+		previous, next := "", ""
+		if i > 0 {
+			previous = Exercises[i-1].ID
+		}
+		if i < len(Exercises)-1 {
+			next = Exercises[i+1].ID
+		}
+
+		ExercisesMap[e.ID] = ExtenderExercise{
+			Exercise: e,
+			Previous: previous,
+			Next:     next,
+		}
+	}
 }

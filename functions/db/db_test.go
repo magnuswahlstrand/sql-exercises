@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/magnuswahlstrand/sql-exercises/functions/exercises"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -9,9 +10,11 @@ func TestExercises(t *testing.T) {
 	db := prepareDB()
 	defer db.Close()
 
-	for _, tc := range exercises {
-		t.Run(tc.Test.Name, func(t *testing.T) {
-			_, records, err := Query(db, tc.Test.Query)
+	for _, tc := range exercises.Exercises {
+		tc := tc
+		t.Run(tc.ID, func(t *testing.T) {
+			t.Parallel()
+			_, records, err := Query(db, tc.AnswerQuery)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -28,7 +31,7 @@ func TestBasic(t *testing.T) {
 	db := prepareDB()
 	defer db.Close()
 
-	records, err := Query(db, `SELECT * FROM employees`)
+	_, records, err := Query(db, `SELECT * FROM employees`)
 	if err != nil {
 		t.Fatal(err)
 	}

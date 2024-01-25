@@ -101,7 +101,7 @@ func (c *Checker) Check(exerciseId string, query string) (*Response, error) {
 	}
 
 	response := &Response{
-		Success: isCorrect(exercise, records),
+		Success: isCorrect(exercise.Exercise, records),
 		Headers: headers,
 		Rows:    records,
 	}

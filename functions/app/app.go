@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"embed"
 	"fmt"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -18,10 +19,13 @@ import (
 //go:embed views/*
 var templates embed.FS
 
+const debug = true
+
 func SetupApp() *fiber.App {
 	engine := html.NewFileSystem(http.FS(templates), ".gohtml")
 	engine.Reload(true)
 	engine.Debug(true)
+	engine.AddFuncMap(sprig.FuncMap())
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
@@ -59,6 +63,26 @@ func SetupApp() *fiber.App {
 		})
 	})
 
+	app.Get("/exercises/:exerciseId", func(ctx *fiber.Ctx) error {
+		exerciseId := ctx.Params("exerciseId")
+		exercise, found := exercises.ExercisesMap[exerciseId]
+		if !found {
+			return ctx.Status(404).SendString("Not found")
+		}
+
+		return ctx.Render("views/index", fiber.Map{
+			"DebugMode": debug,
+			"Expected": fiber.Map{
+				"Headers": exercise.CorrectHeaders,
+				"Rows":    exercise.Correct,
+			},
+			"Description":   exercise.Description,
+			"ServerVersion": serverVersion,
+			"Previous":      exercise.Previous,
+			"Next":          exercise.Next,
+		})
+	})
+
 	app.Get("/check/:exerciseId", func(ctx *fiber.Ctx) error {
 		query := ctx.Query("query")
 		exerciseId := ctx.Params("exerciseId")
@@ -77,9 +101,18 @@ func SetupApp() *fiber.App {
 			statusCode = 200
 		}
 
+		icon := "✅"
+		if !result.Success {
+			icon = "❌"
+		}
+
+		ctx.Set("HX-Trigger", "showMessage")
+		ctx.Set("HX-Trigger", "{\"showMessage\":\"Here Is A Message\"}")
+
 		return ctx.Status(statusCode).Render("views/output_table", fiber.Map{
-			"Headers": result.Headers,
-			"Rows":    result.Rows,
+			"Headers":    result.Headers,
+			"Rows":       result.Rows,
+			"ResultIcon": icon,
 		})
 	})
 

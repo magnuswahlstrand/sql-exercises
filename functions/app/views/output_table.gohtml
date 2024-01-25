@@ -2,7 +2,7 @@
     <tr>
         {{- /*gotype: github.com/magnuswahlstrand/sql-exercises/functions/db.Response*/ -}}
         {{range .Headers}}
-            <td class="p-2 font-bold bg-slate-200">{{.}}</td>
+            <td class="p-2 font-bold bg-slate-200 border">{{.}}</td>
         {{end}}
     </tr>
     {{range .Rows}}
@@ -13,3 +13,7 @@
         </tr>
     {{end}}
 </table>
+{{ if .ResultIcon }}
+    <div hx-swap-oob="innerHTML:#result_icon>div">{{.ResultIcon}}</div>
+{{end}}
+

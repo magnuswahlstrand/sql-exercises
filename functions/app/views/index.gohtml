@@ -6,56 +6,79 @@
             crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/preload.js"></script>
+
+
     <script>
-        // htmx.logAll();
-        htmx.on("htmx:sseMessage", function(evt) {
+        htmx.logAll();
+        {{ if .DebugMode }}
+        htmx.on("htmx:sseMessage", function (evt) {
             if (evt.detail.type == "trigger_reload") {
-                console.log("RELOAD")
                 window.location.reload();
             }
         });
+        {{ end }}
+        // Log htmx key events
+        // htmx.on("keydown", function (evt) {
+        //     console.log("htmx:keydown", evt, evt.altKey, evt.ctrlKey, evt.shiftKey, evt.metaKey)
+        // });
+        htmx.on("showMessage", function(evt){
+            alert(evt.detail.value);
+        })
     </script>
 </head>
 <style>
     * {
-        outline: 1px solid red;
+        outline: 0px solid red;
     }
 </style>
-<body class="bg-red-50">
-<div hx-ext="sse" sse-connect="/sse?version={{.ServerVersion}}" sse-swap="trigger_reload"></div>
+<body class="bg-orange-50" hx-boost="true">
+{{ if .DebugMode }}
+    <div hx-ext="sse" sse-connect="/sse?version={{.ServerVersion}}" sse-swap="trigger_reload">&nbsp;</div>
+{{end}}
+
 {{define "small_title"}}
-    <div class="flex justify-center font-semibold text-lg pt-2 pb-1">{{.}}</div>
+    <div id="{{.Id}}" class="flex justify-center font-semibold text-lg pt-3 pb-1 border border-orange-700 border-x-0 bg-orange-300">
+        {{.Text}}<div class="ml-1"></div></div>
 {{end}}
 
 
 <div class="container mx-auto">
-    <div class="flex flex-row flex-wrap my-4 bg-red-100">
-        <aside class="w-full sm:w-1/2">
+    <div class="flex flex-row flex-wrap my-4 rounded border border-orange-700 border-t-0 bg-white">
+        <aside class="w-full sm:w-1/2 border-orange-700 border-r-2 bg-stone-50">
             <div>
-                {{template "small_title" "Exercise"}}
-                <div class="h-24 p-2">Select everything from employees table</div>
+                {{template "small_title" dict "Text" "Task"}}
+                <div class="h-24 p-2 text-lg italic">{{.Description}}</div>
 
-                {{template "small_title" "Expected output"}}
+                {{template "small_title" dict "Text" "Expected output"}}
                 <div class="flex justify-center">
                     {{template "views/output_table" .Expected}}
                 </div>
             </div>
         </aside>
         <main role="main" class="w-full sm:w-1/2">
-            {{template "small_title" "Answer"}}
-            <textarea class="w-full h-24 p-2 font-mono	"
+            {{template "small_title" dict "Text" "Your query"}}
+            <textarea class="w-full h-24 p-2 font-mono"
+                      autofocus
                       name="query"
+                      placeholder="Enter your query here..."
                       hx-get="http://localhost:3000/check/select_all"
-                      hx-trigger="load, input changed delay:500ms, search"
+                      hx-trigger="input changed delay:500ms, load"
                       hx-target="#results"
-                      hx-indicator=".htmx-indicator">
-select * from employees            </textarea>
-
-            {{template "small_title" "Results"}}
-            <div id="results" class="flex justify-center">
+                      hx-indicator=".htmx-indicator">select * from employees</textarea>
+            {{template "small_title" dict "Text" "Your output" "Id" "result_icon"}}
+{{/*            <div id="message"></div>*/}}
+            <div id="result_icon"></div>
+            <div id="results" class="flex justify-center min-h-12">
 
             </div>
         </main>
+    </div>
+
+
+    <div class="flex justify-between">
+        {{template "views/basic_button" dict "Url" .Previous "Text" "Previous Exercise"}}
+        {{template "views/basic_button" dict "Url" .Next "Text" "Next Exercise"}}
     </div>
 </div>
 
