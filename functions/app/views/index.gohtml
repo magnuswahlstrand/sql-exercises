@@ -10,7 +10,9 @@
 
 
     <script>
-        htmx.logAll();
+
+        const local_storage_key = "{{.ID}}.complete"
+        // htmx.logAll();
         {{ if .DebugMode }}
         htmx.on("htmx:sseMessage", function (evt) {
             if (evt.detail.type == "trigger_reload") {
@@ -18,13 +20,35 @@
             }
         });
         {{ end }}
-        // Log htmx key events
-        // htmx.on("keydown", function (evt) {
-        //     console.log("htmx:keydown", evt, evt.altKey, evt.ctrlKey, evt.shiftKey, evt.metaKey)
-        // });
-        htmx.on("showMessage", function(evt){
-            alert(evt.detail.value);
+
+        function createIcon(icon) {
+            return `<div class="ml-2 absolute">${icon}</div>`
+        }
+
+        function updateTitleIcon(icon) {
+            document.querySelector("#title > div").innerHTML = icon
+        }
+
+        htmx.on("query_evaluated", function (evt) {
+            const success = evt.detail.is_successful
+            const icon = createIcon(success ? "✅" : "❌")
+            document.querySelector("#result_header > div > div").innerHTML = icon
+            if (success) {
+                updateTitleIcon(icon)
+                localStorage.setItem(local_storage_key, "true");
+            }
+
         })
+
+        const was_completed = localStorage.getItem(local_storage_key);
+        console.log("was_completed", was_completed)
+        console.log("was_completed", local_storage_key)
+        document.addEventListener("DOMContentLoaded", function() {
+            // TODO: Update BEFORE page is loaded?
+            if (was_completed === "true") {
+                updateTitleIcon(createIcon("✅"))
+            }
+        });
     </script>
 </head>
 <style>
@@ -38,36 +62,47 @@
 {{end}}
 
 {{define "small_title"}}
-    <div id="{{.Id}}" class="flex justify-center font-semibold text-lg pt-3 pb-1 border border-orange-700 border-x-0 bg-orange-300">
-        {{.Text}}<div class="ml-1"></div></div>
+    <div class="flex justify-center font-semibold text-lg pt-3 pb-1 border border-orange-700 border-x-0 bg-orange-300">
+        {{.}}
+        <div></div>
+    </div>
 {{end}}
 
 
 <div class="container mx-auto">
+    <div class="text-5xl font-bold flex" id="title">
+        {{ .Title }}
+        <div></div>
+    </div>
+    <script>
+        if (was_completed === "true") updateTitleIcon(createIcon("✅"))
+    </script>
     <div class="flex flex-row flex-wrap my-4 rounded border border-orange-700 border-t-0 bg-white">
         <aside class="w-full sm:w-1/2 border-orange-700 border-r-2 bg-stone-50">
             <div>
-                {{template "small_title" dict "Text" "Task"}}
+                {{template "small_title" "Task"}}
                 <div class="h-24 p-2 text-lg italic">{{.Description}}</div>
 
-                {{template "small_title" dict "Text" "Expected output"}}
+                {{template "small_title" "Expected output"}}
                 <div class="flex justify-center">
                     {{template "views/output_table" .Expected}}
                 </div>
             </div>
         </aside>
         <main role="main" class="w-full sm:w-1/2">
-            {{template "small_title" dict "Text" "Your query"}}
+            {{template "small_title" "Your query"}}
             <textarea class="w-full h-24 p-2 font-mono"
                       autofocus
                       name="query"
                       placeholder="Enter your query here..."
                       hx-get="http://localhost:3000/check/select_all"
-                      hx-trigger="input changed delay:500ms, load"
+                      hx-trigger="input changed delay:500ms"
                       hx-target="#results"
                       hx-indicator=".htmx-indicator">select * from employees</textarea>
-            {{template "small_title" dict "Text" "Your output" "Id" "result_icon"}}
-{{/*            <div id="message"></div>*/}}
+            <div id="result_header">
+                {{template "small_title" "Your output"}}
+            </div>
+            {{/*            <div id="message"></div>*/}}
             <div id="result_icon"></div>
             <div id="results" class="flex justify-center min-h-12">
 

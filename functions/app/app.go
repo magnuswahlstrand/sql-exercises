@@ -3,6 +3,7 @@ package app
 import (
 	"bufio"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
 	"github.com/gofiber/fiber/v2"
@@ -71,6 +72,8 @@ func SetupApp() *fiber.App {
 		}
 
 		return ctx.Render("views/index", fiber.Map{
+			"ID":        exercise.ID,
+			"Title":     exercise.Title,
 			"DebugMode": debug,
 			"Expected": fiber.Map{
 				"Headers": exercise.CorrectHeaders,
@@ -92,27 +95,14 @@ func SetupApp() *fiber.App {
 
 		result, err := checker.Check(exerciseId, query)
 		if err != nil {
+			SetEventTriggerHeader(ctx, false, query)
 			return ctx.Status(200).SendString(err.Error())
 		}
 
-		statusCode := 200
-		if !result.Success {
-			//statusCode = 400
-			statusCode = 200
-		}
-
-		icon := "✅"
-		if !result.Success {
-			icon = "❌"
-		}
-
-		ctx.Set("HX-Trigger", "showMessage")
-		ctx.Set("HX-Trigger", "{\"showMessage\":\"Here Is A Message\"}")
-
-		return ctx.Status(statusCode).Render("views/output_table", fiber.Map{
-			"Headers":    result.Headers,
-			"Rows":       result.Rows,
-			"ResultIcon": icon,
+		SetEventTriggerHeader(ctx, result.Success, query)
+		return ctx.Render("views/output_table", fiber.Map{
+			"Headers": result.Headers,
+			"Rows":    result.Rows,
 		})
 	})
 
@@ -147,4 +137,14 @@ func SetupApp() *fiber.App {
 	app.Get("/sse", sseHandler)
 
 	return app
+}
+
+func SetEventTriggerHeader(ctx *fiber.Ctx, isSuccessful bool, query string) {
+	b, _ := json.MarshalIndent(fiber.Map{
+		"query_evaluated": fiber.Map{
+			"is_successful": isSuccessful,
+			"query":         query,
+		},
+	}, "", "  ")
+	ctx.Set("HX-Trigger", string(b))
 }
