@@ -1,15 +1,19 @@
 # sql-exercises
 
 
-TODO
+### Features
 * [x] Show checkmark on success/error on failure
-* [ ] Store success forever
-  * [ ] Fix bug
+* [x] Store success forever
 * [ ] Store current query
+* [ ] Add more exercises
 * [ ] Add formatter
+* [ ] Code highlighting
+
+
+### Prepare for production
+* [ ] Fix tailwind production setup
 * [ ] Add timeout for request
 * [ ] Readonly DB
-* [ ] Code highlighting
-* [ ] Fix tailwind production setup
+
+### Deployment
 * [ ] Deploy to production
-* [ ] Add more exercises

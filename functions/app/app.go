@@ -95,11 +95,11 @@ func SetupApp() *fiber.App {
 
 		result, err := checker.Check(exerciseId, query)
 		if err != nil {
-			SetEventTriggerHeader(ctx, false, query)
+			SetEventTriggerHeader(ctx, false, query, exerciseId)
 			return ctx.Status(200).SendString(err.Error())
 		}
 
-		SetEventTriggerHeader(ctx, result.Success, query)
+		SetEventTriggerHeader(ctx, result.Success, query, exerciseId)
 		return ctx.Render("views/output_table", fiber.Map{
 			"Headers": result.Headers,
 			"Rows":    result.Rows,
@@ -139,9 +139,10 @@ func SetupApp() *fiber.App {
 	return app
 }
 
-func SetEventTriggerHeader(ctx *fiber.Ctx, isSuccessful bool, query string) {
+func SetEventTriggerHeader(ctx *fiber.Ctx, isSuccessful bool, query string, id string) {
 	b, _ := json.MarshalIndent(fiber.Map{
 		"query_evaluated": fiber.Map{
+			"id":            id,
 			"is_successful": isSuccessful,
 			"query":         query,
 		},

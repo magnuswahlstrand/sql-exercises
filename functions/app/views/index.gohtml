@@ -11,7 +11,6 @@
 
     <script>
 
-        const local_storage_key = "{{.ID}}.complete"
         // htmx.logAll();
         {{ if .DebugMode }}
         htmx.on("htmx:sseMessage", function (evt) {
@@ -30,25 +29,17 @@
         }
 
         htmx.on("query_evaluated", function (evt) {
+            console.log("query_evaluated", evt.detail)
             const success = evt.detail.is_successful
             const icon = createIcon(success ? "✅" : "❌")
             document.querySelector("#result_header > div > div").innerHTML = icon
             if (success) {
                 updateTitleIcon(icon)
-                localStorage.setItem(local_storage_key, "true");
+                localStorage.setItem(evt.detail.id + ".complete", "true");
             }
+            console.log("YEAAH")
 
         })
-
-        const was_completed = localStorage.getItem(local_storage_key);
-        console.log("was_completed", was_completed)
-        console.log("was_completed", local_storage_key)
-        document.addEventListener("DOMContentLoaded", function() {
-            // TODO: Update BEFORE page is loaded?
-            if (was_completed === "true") {
-                updateTitleIcon(createIcon("✅"))
-            }
-        });
     </script>
 </head>
 <style>
@@ -75,7 +66,7 @@
         <div></div>
     </div>
     <script>
-        if (was_completed === "true") updateTitleIcon(createIcon("✅"))
+        if (localStorage.getItem("{{.ID}}.complete") === "true") updateTitleIcon(createIcon("✅"))
     </script>
     <div class="flex flex-row flex-wrap my-4 rounded border border-orange-700 border-t-0 bg-white">
         <aside class="w-full sm:w-1/2 border-orange-700 border-r-2 bg-stone-50">
@@ -95,7 +86,7 @@
                       autofocus
                       name="query"
                       placeholder="Enter your query here..."
-                      hx-get="http://localhost:3000/check/select_all"
+                      hx-get="http://localhost:3000/check/{{.ID}}"
                       hx-trigger="input changed delay:500ms"
                       hx-target="#results"
                       hx-indicator=".htmx-indicator">select * from employees</textarea>

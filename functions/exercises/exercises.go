@@ -37,8 +37,8 @@ var Exercises = []Exercise{
 		},
 		AnswerQuery: "SELECT * FROM employees",
 	},
-
 	{
+		Title:       "Select specific columns",
 		ID:          "select_columns",
 		Description: "Select last_name and department from the employees table.",
 		CorrectHeaders: []string{
@@ -58,6 +58,7 @@ var Exercises = []Exercise{
 		AnswerQuery: "SELECT last_name, department FROM employees",
 	},
 	{
+		Title:       "Order by a column",
 		ID:          "select_order_by",
 		Description: "Select all columns from the employees table, ordered by salary in descending order.",
 		CorrectHeaders: []string{
@@ -66,14 +67,14 @@ var Exercises = []Exercise{
 			"department",
 		},
 		Correct: [][]any{
-			{"Nyström", 58000, "Sales"},
-			{"Lindberg", 56000, "Sales"},
-			{"Bergstrom", 52000, "Sales"},
-			{"Engström", 50000, "Marketing"},
-			{"Larsson", 48000, "Accounting"},
-			{"Hakansson", 46000, "Marketing"},
-			{"Holm", 43000, "IT"},
-			{"Svensson", 39000, "Accounting"},
+			{"Nyström", int64(58000), "Sales"},
+			{"Lindberg", int64(56000), "Sales"},
+			{"Bergstrom", int64(52000), "Sales"},
+			{"Engström", int64(50000), "Marketing"},
+			{"Larsson", int64(48000), "Accounting"},
+			{"Hakansson", int64(46000), "Marketing"},
+			{"Holm", int64(43000), "IT"},
+			{"Svensson", int64(39000), "Accounting"},
 		},
 		AnswerQuery: "SELECT * FROM employees ORDER BY salary DESC",
 	},

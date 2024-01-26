@@ -13,7 +13,6 @@ func TestExercises(t *testing.T) {
 	for _, tc := range exercises.Exercises {
 		tc := tc
 		t.Run(tc.ID, func(t *testing.T) {
-			t.Parallel()
 			_, records, err := Query(db, tc.AnswerQuery)
 			if err != nil {
 				t.Fatal(err)
