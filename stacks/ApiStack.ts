@@ -1,15 +1,19 @@
-import {Api, Config, StackContext, Table} from "sst/constructs";
+import {Api, StackContext, Function} from "sst/constructs";
 
 export function ApiStack({stack}: StackContext) {
+    const routerFunc = new Function(stack, "Router", {
+        handler: "functions/lambda-entrypoint/main.go",
+        go: {
+            // cgoEnabled: true,
+            // ldFlags: ["-linkmode external -extldflags \"-static\""],
+
+        }
+    });
+
     const api = new Api(stack, "SqlExercises", {
-        defaults: {
-            function: {
-                environment: {}
-            }
-        },
         routes: {
-            "ANY /{proxy+}": "functions/lambda-entrypoint/main.go",
-            "OPTIONS /{proxy+}": "functions/lambda-entrypoint/main.go",
+            "ANY /{proxy+}": routerFunc,
+            "OPTIONS /{proxy+}": routerFunc,
         },
 
     });

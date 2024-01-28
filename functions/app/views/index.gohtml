@@ -1,24 +1,7 @@
 <html>
 <head>
-    <title>HTMX</title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"
-            integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/preload.js"></script>
-
-
+    {{template "views/header" .}}
     <script>
-
-        // htmx.logAll();
-        {{ if .DebugMode }}
-        htmx.on("htmx:sseMessage", function (evt) {
-            if (evt.detail.type == "trigger_reload") {
-                window.location.reload();
-            }
-        });
-        {{ end }}
 
         function createIcon(icon) {
             return `<div class="ml-2 absolute">${icon}</div>`
@@ -42,70 +25,42 @@
         })
     </script>
 </head>
-<style>
-    * {
-        outline: 0px solid red;
-    }
-</style>
 <body class="bg-orange-50" hx-boost="true">
 {{ if .DebugMode }}
     <div hx-ext="sse" sse-connect="/sse?version={{.ServerVersion}}" sse-swap="trigger_reload">&nbsp;</div>
 {{end}}
 
-{{define "small_title"}}
-    <div class="flex justify-center font-semibold text-lg pt-3 pb-1 border border-orange-700 border-x-0 bg-orange-300">
-        {{.}}
-        <div></div>
-    </div>
-{{end}}
-
 
 <div class="container mx-auto">
     <div class="text-5xl font-bold flex" id="title">
-        {{ .Title }}
-        <div></div>
+        SQL Exercises
+    </div>
+
+    Welcome to SQL Exercises. This is a tool that allows you to practice your SQL skills!
+
+
+    <div class="mt-5">
+
+    <div class="font-bold">Here are the current exercises:</div>
+    {{- /*gotype: github.com/magnuswahlstrand/sql-exercises/functions/exercises.Exercise*/ -}}
+    <ul class="list-disc ml-3 mt-3">
+        {{ range .Exercises }}
+            <li class="flex flex-row">
+                <div id="{{.ID}}-icon" class="mx-2"></div>
+                <a href="/exercises/{{ .ID }}" class="underline hover:no-underline">{{ .Title }}</a>
+            </li>
+        {{ end }}
+    </ul>
     </div>
     <script>
-        if (localStorage.getItem("{{.ID}}.complete") === "true") updateTitleIcon(createIcon("✅"))
+        const exercise_ids = [{{ range .Exercises }}"{{.ID}}",{{ end }}]
+        console.log(exercise_ids);
+        exercise_ids.forEach(id => {
+            if (localStorage.getItem(id + ".complete") === "true") {
+                document.querySelector("#" + id + "-icon").innerHTML = "✅";
+            }
+        })
     </script>
-    <div class="flex flex-row flex-wrap my-4 rounded border border-orange-700 border-t-0 bg-white">
-        <aside class="w-full sm:w-1/2 border-orange-700 border-r-2 bg-stone-50">
-            <div>
-                {{template "small_title" "Task"}}
-                <div class="h-24 p-2 text-lg italic">{{.Description}}</div>
-
-                {{template "small_title" "Expected output"}}
-                <div class="flex justify-center">
-                    {{template "views/output_table" .Expected}}
-                </div>
-            </div>
-        </aside>
-        <main role="main" class="w-full sm:w-1/2">
-            {{template "small_title" "Your query"}}
-            <textarea class="w-full h-24 p-2 font-mono"
-                      autofocus
-                      name="query"
-                      placeholder="Enter your query here..."
-                      hx-get="http://localhost:3000/check/{{.ID}}"
-                      hx-trigger="input changed delay:500ms"
-                      hx-target="#results"
-                      hx-indicator=".htmx-indicator">select * from employees</textarea>
-            <div id="result_header">
-                {{template "small_title" "Your output"}}
-            </div>
-            {{/*            <div id="message"></div>*/}}
-            <div id="result_icon"></div>
-            <div id="results" class="flex justify-center min-h-12">
-
-            </div>
-        </main>
-    </div>
-
-
-    <div class="flex justify-between">
-        {{template "views/basic_button" dict "Url" .Previous "Text" "Previous Exercise"}}
-        {{template "views/basic_button" dict "Url" .Next "Text" "Next Exercise"}}
-    </div>
 </div>
 
 </body>

@@ -1,0 +1,22 @@
+<title>SQL Exercises</title>
+<script src="https://unpkg.com/htmx.org@1.9.10"
+        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+<script src="https://unpkg.com/htmx.org/dist/ext/preload.js"></script>
+<script>
+    // htmx.logAll();
+    {{ if .DebugMode }}
+    htmx.on("htmx:sseMessage", function (evt) {
+        if (evt.detail.type == "trigger_reload") {
+            window.location.reload();
+        }
+    });
+    {{ end }}
+</script>
+<style>
+    * {
+        outline: 0px solid red;
+    }
+</style>

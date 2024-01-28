@@ -24,8 +24,8 @@ const debug = true
 
 func SetupApp() *fiber.App {
 	engine := html.NewFileSystem(http.FS(templates), ".gohtml")
-	engine.Reload(true)
-	engine.Debug(true)
+	engine.Reload(debug)
+	engine.Debug(debug)
 	engine.AddFuncMap(sprig.FuncMap())
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -56,10 +56,8 @@ func SetupApp() *fiber.App {
 	// TODO: Close DB
 	app.Get("/", func(ctx *fiber.Ctx) error {
 		return ctx.Render("views/index", fiber.Map{
-			"Expected": fiber.Map{
-				"Headers": exercises.Exercises[0].CorrectHeaders,
-				"Rows":    exercises.Exercises[0].Correct,
-			},
+			"Exercises":     exercises.Exercises,
+			"DebugMode":     debug,
 			"ServerVersion": serverVersion,
 		})
 	})
@@ -71,7 +69,7 @@ func SetupApp() *fiber.App {
 			return ctx.Status(404).SendString("Not found")
 		}
 
-		return ctx.Render("views/index", fiber.Map{
+		return ctx.Render("views/exercises", fiber.Map{
 			"ID":        exercise.ID,
 			"Title":     exercise.Title,
 			"DebugMode": debug,
