@@ -49,7 +49,7 @@ func SetupApp() *fiber.App {
 	))
 	app.Use(logger.New())
 
-	checker := db.NewChecker()
+	checker := db.NewChecker(20 * time.Millisecond)
 
 	var serverVersion = strconv.FormatInt(time.Now().Unix(), 10)
 

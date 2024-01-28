@@ -1,11 +1,13 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/magnuswahlstrand/sql-exercises/functions/exercises"
 	_ "github.com/mattn/go-sqlite3"
+	"time"
 )
 
 var createEmployeesTableQuery = `
@@ -35,8 +37,9 @@ func prepareDB() *sql.DB {
 	if _, err = db.Exec(createEmployeesTableQuery); err != nil {
 		panic(err)
 	}
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(-1)
 
-	// Check that the table was created
 	res, err := db.Query("SELECT * FROM employees")
 	if err != nil {
 		panic(err)
@@ -46,8 +49,14 @@ func prepareDB() *sql.DB {
 	return db
 }
 
-func Query(db *sql.DB, query string) ([]string, [][]any, error) {
-	rows, err := db.Query(query)
+func Query(ctx context.Context, db *sql.DB, query string) ([]string, [][]any, error) {
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return nil, nil, err
+	}
+	defer tx.Rollback()
+
+	rows, err := tx.QueryContext(ctx, query)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -80,7 +89,8 @@ func Query(db *sql.DB, query string) ([]string, [][]any, error) {
 }
 
 type Checker struct {
-	DB *sql.DB
+	DB           *sql.DB
+	maxQueryTime time.Duration
 }
 
 type Response struct {
@@ -95,7 +105,10 @@ func (c *Checker) Check(exerciseId string, query string) (*Response, error) {
 		return nil, errors.New("exercise not found")
 	}
 
-	headers, records, err := Query(c.DB, query)
+	ctx, cancel := context.WithTimeout(context.Background(), c.maxQueryTime)
+	defer cancel()
+
+	headers, records, err := Query(ctx, c.DB, query)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +140,9 @@ func isCorrect(exercise exercises.Exercise, records [][]any) bool {
 	return true
 }
 
-func NewChecker() *Checker {
-	db := prepareDB()
-	return &Checker{DB: db}
+func NewChecker(maxQueryDuration time.Duration) *Checker {
+	return &Checker{
+		DB:           prepareDB(),
+		maxQueryTime: maxQueryDuration,
+	}
 }
