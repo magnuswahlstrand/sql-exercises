@@ -15,3 +15,5 @@ node_modules
 .env*.local
 
 tmp
+bootstrap
+lambda-handler.zip
