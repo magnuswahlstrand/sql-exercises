@@ -1,6 +1,6 @@
 <html>
 <head>
-    {{template "views/header" .}}
+    {{template "components/header" .}}
     <script>
 
         function createIcon(icon) {
@@ -26,12 +26,14 @@
     </script>
 </head>
 <body class="bg-orange-50" hx-boost="true">
+{{template "components/menu" }}
+
 {{ if .DebugMode }}
     <div hx-ext="sse" sse-connect="/sse?version={{.ServerVersion}}" sse-swap="trigger_reload">&nbsp;</div>
 {{end}}
 
 
-<div class="container mx-auto">
+<div class="container mx-auto px-4">
     <div class="text-5xl font-bold flex" id="title">
         SQL Exercises
     </div>
@@ -41,19 +43,19 @@
 
     <div class="mt-5">
 
-    <div class="font-bold">Here are the current exercises:</div>
-    {{- /*gotype: github.com/magnuswahlstrand/sql-exercises/functions/exercises.Exercise*/ -}}
-    <ul class="list-disc ml-3 mt-3">
-        {{ range .Exercises }}
-            <li class="flex flex-row">
-                <div id="{{.ID}}-icon" class="mx-2"></div>
-                <a href="/exercises/{{ .ID }}" class="underline hover:no-underline">{{ .Title }}</a>
-            </li>
-        {{ end }}
-    </ul>
+        <div class="font-bold">Here are the current exercises:</div>
+        {{- /*gotype: github.com/magnuswahlstrand/sql-exercises/functions/exercises.Exercise*/ -}}
+        <ul class="list-disc ml-3 mt-3">
+            {{ range .Exercises }}
+                <li class="flex flex-row">
+                    <div id="{{.ID}}-icon" class="mx-2 w-4"></div>
+                    <a href="/exercises/{{ .ID }}" class="underline hover:no-underline">{{ .Title }}</a>
+                </li>
+            {{ end }}
+        </ul>
     </div>
     <script>
-        const exercise_ids = [{{ range .Exercises }}"{{.ID}}",{{ end }}]
+        var exercise_ids = [{{ range .Exercises }}"{{.ID}}",{{ end }}]
         console.log(exercise_ids);
         exercise_ids.forEach(id => {
             if (localStorage.getItem(id + ".complete") === "true") {

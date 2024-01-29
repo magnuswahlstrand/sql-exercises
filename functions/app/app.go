@@ -13,14 +13,15 @@ import (
 	"github.com/magnuswahlstrand/sql-exercises/functions/db"
 	"github.com/magnuswahlstrand/sql-exercises/functions/exercises"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
 
-//go:embed views/*
+//go:embed views/* components/*
 var templates embed.FS
 
-const debug = true
+var debug = os.Getenv("SST_STAGE") == ""
 
 func SetupApp() *fiber.App {
 	engine := html.NewFileSystem(http.FS(templates), ".gohtml")
@@ -54,14 +55,6 @@ func SetupApp() *fiber.App {
 	var serverVersion = strconv.FormatInt(time.Now().Unix(), 10)
 
 	// TODO: Close DB
-	app.Get("/", func(ctx *fiber.Ctx) error {
-		return ctx.Render("views/index", fiber.Map{
-			"Exercises":     exercises.Exercises,
-			"DebugMode":     debug,
-			"ServerVersion": serverVersion,
-		})
-	})
-
 	app.Get("/exercises/:exerciseId", func(ctx *fiber.Ctx) error {
 		exerciseId := ctx.Params("exerciseId")
 		exercise, found := exercises.ExercisesMap[exerciseId]
@@ -98,41 +91,63 @@ func SetupApp() *fiber.App {
 		}
 
 		SetEventTriggerHeader(ctx, result.Success, query, exerciseId)
-		return ctx.Render("views/output_table", fiber.Map{
+		return ctx.Render("components/output_table", fiber.Map{
 			"Headers": result.Headers,
 			"Rows":    result.Rows,
 		})
 	})
 
-	sseHandler := func(c *fiber.Ctx) error {
-		version := c.Query("version")
-		c.Set("Content-Type", "text/event-stream")
-		c.Set("Cache-Control", "no-cache")
-		c.Set("Connection", "keep-alive")
-		c.Set("Transfer-Encoding", "chunked")
+	if debug {
+		sseHandler := func(c *fiber.Ctx) error {
+			version := c.Query("version")
+			c.Set("Content-Type", "text/event-stream")
+			c.Set("Cache-Control", "no-cache")
+			c.Set("Connection", "keep-alive")
+			c.Set("Transfer-Encoding", "chunked")
 
-		c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
-			if version != serverVersion {
-				fmt.Fprintf(w, "event: trigger_reload\n")
-				fmt.Fprintf(w, "data: \"\"\n\n")
-				if err := w.Flush(); err != nil {
-					fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
+			c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
+				if version != serverVersion {
+					fmt.Fprintf(w, "event: trigger_reload\n")
+					fmt.Fprintf(w, "data: \"\"\n\n")
+					if err := w.Flush(); err != nil {
+						fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
+					}
+				} else {
+					fmt.Println("Same version! Don't trigger")
 				}
-			} else {
-				fmt.Println("Same version! Don't trigger")
-			}
-			//msg := fmt.Sprintf("%d - the 2time is %v", i, time.Now())
+				//msg := fmt.Sprintf("%d - the 2time is %v", i, time.Now())
 
-			for {
-				// TODO: lock here forever, instead?
-				time.Sleep(1 * time.Second)
-			}
-		})
+				for {
+					// TODO: lock here forever, instead?
+					time.Sleep(1 * time.Second)
+				}
+			})
 
-		return nil
+			return nil
+		}
+		app.Get("/sse", sseHandler)
 	}
 
-	app.Get("/sse", sseHandler)
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.Render("views/index", fiber.Map{
+			"Exercises":     exercises.Exercises,
+			"DebugMode":     debug,
+			"ServerVersion": serverVersion,
+		})
+	})
+
+	app.Get("/:page", func(ctx *fiber.Ctx) error {
+		page := ctx.Params("page")
+		switch page {
+		case "about":
+			return ctx.Render("views/about", fiber.Map{
+				"DebugMode":     debug,
+				"ServerVersion": serverVersion,
+			})
+		default:
+			return ctx.Render("views/not_found", fiber.Map{})
+		}
+	})
 
 	return app
 }

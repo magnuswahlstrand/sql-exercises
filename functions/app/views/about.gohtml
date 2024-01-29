@@ -1,0 +1,56 @@
+<html>
+<head>
+    {{template "components/header" .}}
+</head>
+<body class="bg-orange-50" hx-boost="true">
+{{template "components/menu" }}
+
+{{ if .DebugMode }}
+    <div hx-ext="sse" sse-connect="/sse?version={{.ServerVersion}}" sse-swap="trigger_reload">&nbsp;</div>
+{{end}}
+
+
+<div class="container mx-auto px-4">
+    <div class="text-5xl font-bold flex" id="title">
+        About
+    </div>
+    <div class="flex flex-col gap-4">
+        <div>
+            Welcome to SQL Exercises. This is a tool that allows you to practice your SQL skills! This site was inspired
+            by <a href="https://alisdairowens.net">Alisdair Owens'</a> excellent
+            <a href="https://pgexercises.com/">pgexercises.com</a>.
+        </div>
+        <div>
+
+            {{template "components/h3" "How does it work?"}}
+            The backend is written in <a href="https://go.dev/">Go</a> and deployed to AWS Lambda using <a
+                    href="https://sst.dev">sst.dev</a>. The frontend is written in <a href="https://tailwindcss.com/">Tailwind
+                CSS</a> and <a href="https://htmx.org/">htmx</a>. The database is SQLite.
+
+            For now, here are a bunch of links:
+            <ul class="list-disc ml-6">
+                <li><a href="https://htmx.org/">htmx.org</a> - simple js library to extend HTML</li>
+                <li><a href="github.com/mattn/go-sqlite3">github.com/mattn/go-sqlite3</a> - sqlite driver</li>
+                <li><a href="https://github.com/gofiber/fiber">github.com/gofiber/fiber</a> - router</li>
+                <li><a href="https://sst.dev">sst.dev</a> - deployment</li>
+                <li><a href="https://tailwindcss.com/">tailwindcss.com</a> - css framework</li>
+
+            </ul>
+        </div>
+
+
+        <div>
+            {{template "components/h3" "Contribution"}}
+            <p class="mt-2">You can contribute to this project on <a
+                        href="https://github.com/magnuswahlstrand/sql-exercises">GitHub</a>. If you don't want to create
+                a
+                PR, you can contact me and suggest improvements through this <a
+                        href="https://forms.gle/7BAEgDgJsNqz7TCf9">Google
+                    Form</a>.</p>
+        </div>
+
+
+    </div>
+</div>
+</body>
+</html>
