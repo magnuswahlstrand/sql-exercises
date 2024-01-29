@@ -57,3 +57,10 @@ docker create --name temp-container go-lambda-app
 docker cp temp-container:/app/bootstrap ./bootstrap
 docker rm temp-container
 ```
+
+
+...
+#11 28.52 # runtime/cgo
+#11 28.52 gcc: error: unrecognized command line option '-m64'
+https://github.com/confluentinc/confluent-kafka-go/issues/898
+
