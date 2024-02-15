@@ -9,7 +9,7 @@ If you don't want to create a PR, you can contact me and suggest improvements th
 ### Features
 * [x] Show checkmark on success/error on failure
 * [x] Store success forever
-* [ ] Store current query
+* [x] Store current query
 * [ ] Add more exercises
 * [ ] Add formatter
 * [ ] Code highlighting
