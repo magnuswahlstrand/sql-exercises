@@ -17,7 +17,7 @@ If you don't want to create a PR, you can contact me and suggest improvements th
 * [x] About
 
 ### Prepare for production
-* [ ] Fix tailwind production setup
+* [x] Fix tailwind production setup
 * [x] Add timeout for request
   * Set a generous 20 ms
 * [x] Readonly DB
