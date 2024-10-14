@@ -13,7 +13,6 @@ import (
 	"github.com/magnuswahlstrand/sql-exercises/functions/db"
 	"github.com/magnuswahlstrand/sql-exercises/functions/exercises"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 )
@@ -21,7 +20,7 @@ import (
 //go:embed views/* components/*
 var templates embed.FS
 
-var debug = os.Getenv("SST_STAGE") == ""
+var debug = false
 
 func SetupApp() *fiber.App {
 	engine := html.NewFileSystem(http.FS(templates), ".gohtml")
